@@ -2,7 +2,7 @@ import os
 import requests
 
 # GitHub API 관련 설정
-TOKEN = os.getenv('TOKEN')
+GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
 OWNER = os.getenv('OWNER')
 REPOSITORY = os.getenv('REPOSITORY')
 
@@ -10,7 +10,7 @@ REPOSITORY = os.getenv('REPOSITORY')
 HOST = f"https://api.github.com/repos/{OWNER}/{REPOSITORY}"
 
 headers = {
-    "Authorization": f"Bearer {TOKEN}",
+    "Authorization": f"Bearer {GITHUB_TOKEN}",
     "Accept": "application/vnd.github+json",
     "X-Github-Api-Version": "2022-11-28"
 }
