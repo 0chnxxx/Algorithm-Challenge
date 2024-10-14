@@ -66,5 +66,5 @@
 - 여기에 없다면 이슈로 열어주세요.
 
 # 명예의 전당
-
-준비 중..
+<!-- BEGIN TOP CONTRIBUTORS -->
+<!-- END TOP CONTRIBUTORS -->
