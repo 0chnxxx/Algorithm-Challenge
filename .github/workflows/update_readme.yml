@@ -27,7 +27,8 @@ jobs:
           pip install -r script/requirements.txt
 
       - name: Run python script
-        run: python script/collector.py
+        working-directory: ./script
+        run: python collector.py
 
       - name: Check for changes in README.md
         id: check_changes
