@@ -31,29 +31,30 @@ def fetch_contributors():
 
 
 def update_readme(contributors):
+    if not contributors:
+        return
+
     readme_path = "../README.md"
 
     with open(readme_path, "r", encoding="utf-8") as file:
         readme_content = file.readlines()
 
-    content = "### 기여도 TOP 5"
-    content += "<table>\n"
+    content = "### 참여도 TOP 5\n"
+    content += "<table>\n<tr>\n"
 
     for contributor in contributors:
         content += (
-            "<tr>\n"
             "<td align='center'>\n"
             f"<img src='{contributor['avatar_url']}' width='100' height='100'><br>\n"
             f"<a href='{contributor['html_url']}'>{contributor['login']}</a><br>\n"
             f"<span>{contributor['total']} commits</span>\n"
             "</td>\n"
-            "</tr>\n"
         )
 
-    content += "</table>"
+    content += "</tr>\n</table>\n"
 
-    start_tag = "<!-- BEGIN TOP CONTRIBUTORS -->"
-    end_tag = "<!-- END TOP CONTRIBUTORS -->"
+    start_tag = "<!-- BEGIN TOP CONTRIBUTORS -->\n"
+    end_tag = "<!-- END TOP CONTRIBUTORS -->\n"
 
     start_index = readme_content.index(start_tag) + 1
     end_index = readme_content.index(end_tag)
@@ -70,7 +71,9 @@ def update_readme(contributors):
 
 def main():
     total_contributors = fetch_contributors()
-    best_contributors = sorted(total_contributors, key=lambda x: x["total"], reverse=True)[:10]
+    best_contributors = sorted(total_contributors, key=lambda x: x["total"], reverse=True)[:5]
+
+    print(best_contributors)
 
     update_readme(best_contributors)
 
