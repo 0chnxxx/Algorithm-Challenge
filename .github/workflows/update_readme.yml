@@ -22,13 +22,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r script/requirements.txt
 
-      - name: Access to secrets
-        env:
-          TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        run: |
-          echo "TOKEN=$TOKEN" >> .env
-
       - name: Run python script
+        env:
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         working-directory: ./script
         run: python collector.py
 
