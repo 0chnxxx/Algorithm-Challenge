@@ -2,7 +2,7 @@ import os
 import requests
 
 # GitHub API 관련 설정
-GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
+GITHUB_TOKEN = os.getenv('TOKEN')
 OWNER = "0chnxxx"
 REPOSITORY = "Algorithm-Challenge"
 

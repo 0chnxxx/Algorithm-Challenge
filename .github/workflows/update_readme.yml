@@ -8,8 +8,6 @@ jobs:
   run-script:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -26,6 +24,8 @@ jobs:
 
       - name: Run python script
         working-directory: ./script
+        env:
+          TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: python collector.py
 
       - name: Check for changes in README.md
