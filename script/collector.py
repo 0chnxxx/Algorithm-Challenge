@@ -19,6 +19,8 @@ def fetch_contributors():
     response = requests.get(f"{HOST}/stats/contributors", headers=headers)
     response_json = response.json()
 
+    print(response_json)
+
     return [
         {
             "total": data["total"],
