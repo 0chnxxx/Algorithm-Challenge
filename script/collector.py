@@ -3,8 +3,8 @@ import requests
 
 # GitHub API 관련 설정
 GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
-OWNER = os.getenv('OWNER')
-REPOSITORY = os.getenv('REPOSITORY')
+OWNER = "0chnxxx"
+REPOSITORY = "Algorithm-Challenge"
 
 # Github API 설정
 HOST = f"https://api.github.com/repos/{OWNER}/{REPOSITORY}"

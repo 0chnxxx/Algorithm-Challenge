@@ -10,8 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      OWNER: ${{ secrets.OWNER }}
-      REPOSITORY: ${{ secrets.REPOSITORY }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
