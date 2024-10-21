@@ -1,4 +1,5 @@
 import os
+import time
 import requests
 
 # GitHub API 관련 설정
@@ -15,21 +16,35 @@ headers = {
     "X-Github-Api-Version": "2022-11-28"
 }
 
-def fetch_contributors():
-    response = requests.get(f"{HOST}/stats/contributors", headers=headers)
-    response_json = response.json()
+def fetch_contributors(retry=3, delay=2):
+    for attempt in range(retry):
+        try:
+            response = requests.get(f"{HOST}/stats/contributors", headers=headers)
+            response_json = response.json()
 
-    print(response_json)
+            print(response_json)
 
-    return [
-        {
-            "total": data["total"],
-            "login": data["author"]["login"],
-            "avatar_url": data["author"]["avatar_url"],
-            "html_url": data["author"]["html_url"]
-        }
-        for data in response_json
-    ]
+            if response_json == {}:
+                raise ValueError("Empty response received, retrying...")
+
+            return [
+                {
+                    "total": data["total"],
+                    "login": data["author"]["login"],
+                    "avatar_url": data["author"]["avatar_url"],
+                    "html_url": data["author"]["html_url"]
+                }
+                for data in response_json
+            ]
+        except (ValueError, requests.exceptions.RequestException) as e:
+            print(f"Attempt {attempt + 1}/{retry} failed: {e}")
+
+            if attempt < retry - 1:
+                print(f"Retrying in {delay} seconds...")
+                time.sleep(delay)
+            else:
+                print("All retries failed.")
+                return []
 
 
 def update_readme(contributors):
