@@ -72,6 +72,11 @@ def update_readme(contributors):
 
 
 def main():
+    if GITHUB_TOKEN is None:
+        print("token is not set")
+    else:
+        print("token is set")
+
     total_contributors = fetch_contributors()
     best_contributors = sorted(total_contributors, key=lambda x: x["total"], reverse=True)[:5]
 
