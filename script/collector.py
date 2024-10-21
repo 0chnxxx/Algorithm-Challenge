@@ -16,7 +16,7 @@ headers = {
     "X-Github-Api-Version": "2022-11-28"
 }
 
-def fetch_contributors(retry=3, delay=2):
+def fetch_contributors(retry=5, delay=3):
     for attempt in range(retry):
         try:
             response = requests.get(f"{HOST}/stats/contributors", headers=headers)
