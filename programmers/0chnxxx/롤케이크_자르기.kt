@@ -17,11 +17,8 @@ class Solution {
         for (i in 0 until topping.size) {
             leftToppingSet.add(topping[i])
             leftTopping[i] = leftToppingSet.size
-        }
-
-        for (i in topping.size - 1 downTo 0) {
-            rightToppingSet.add(topping[i])
-            rightTopping[i] = rightToppingSet.size
+            rightToppingSet.add(topping[topping.size - 1 - i])
+            rightTopping[topping.size - 1 - i] = rightToppingSet.size
         }
 
         var result = 0
