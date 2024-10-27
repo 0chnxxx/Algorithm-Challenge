@@ -93,7 +93,8 @@ def main():
         print("token is set")
 
     total_contributors = fetch_contributors()
-    best_contributors = sorted(total_contributors, key=lambda x: x["total"], reverse=True)[:5]
+    filtered_contributors = [contributor for contributor in total_contributors if contributor["author"]["login"] != 'github-actions[bot]']
+    best_contributors = sorted(filtered_contributors, key=lambda x: x["total"], reverse=True)[:5]
 
     print(best_contributors)
 
