@@ -24,17 +24,6 @@ N 개의 섬으로 이루어져있다.
 from collections import deque
 
 
-def can_search(x, y, n):
-    distance = abs(x) + abs(y)
-
-    if distance > n:
-        return False
-    elif distance == n:
-        return True
-    else:
-        return True if (n - distance) % 2 == 0 else False
-
-
 def bfs(n, k, bridge):
     graph = [[] for _ in range(n + 1)]
 
