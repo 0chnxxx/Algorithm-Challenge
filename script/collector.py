@@ -32,22 +32,21 @@ def fetch_contributors(retry=5, delay=3):
         target = account.get("target")
         sub = account.get("sub", [])
 
-        if target and sub:
+        if not target or not any(contributor["login"] == target for contributor in contributors):
+            return contributors
+
+        if sub:
             merged_total = sum(
                 contributor["total"] for contributor in contributors
                 if contributor["login"] in sub
             )
 
-            if merged_total > 0:
-                contributors = [
-                    contributor for contributor in contributors
-                    if contributor["login"] not in sub
-                ]
+            for contributor in contributors:
+                if contributor["login"] == target:
+                    contributor["total"] += merged_total
 
-                for contributor in contributors:
-                    if contributor["login"] == target:
-                        contributor["total"] += merged_total
-                        break
+                if contributor["login"] in sub:
+                    contributors.remove(contributor)
 
         return contributors
 
