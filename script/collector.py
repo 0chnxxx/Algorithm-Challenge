@@ -16,24 +16,56 @@ headers = {
     "X-Github-Api-Version": "2022-11-28"
 }
 
+
 def fetch_contributors(retry=5, delay=3):
     merge_accounts = [
-        {
-            "target": "0chnxxx",
-            "sub": ["DeepLeHR-Teemo"]
-        },
-        {
-            "target": "pjkfckr",
-            "sub": ["deeplehr-zed"]
-        }
+        {"target": "0chnxxx", "sub": ["DeepLeHR-Teemo"]},
+        {"target": "pjkfckr", "sub": ["deeplehr-zed"]}
     ]
+
+    def get_contributors():
+        response = requests.get(f"{HOST}/stats/contributors", headers=headers)
+        response.raise_for_status()
+        return response.json()
+
+    def merge_contributors(contributors, account):
+        target = account.get("target")
+        sub = account.get("sub", [])
+
+        if target and sub:
+            merged_total = sum(
+                contributor["total"] for contributor in contributors
+                if contributor["login"] in sub
+            )
+
+            if merged_total > 0:
+                contributors = [
+                    contributor for contributor in contributors
+                    if contributor["login"] not in sub
+                ]
+
+                for contributor in contributors:
+                    if contributor["login"] == target:
+                        contributor["total"] += merged_total
+                        break
+
+        return contributors
+
+    def handle_request_failure(attempt, retry, delay):
+        print(f"Attempt {attempt + 1}/{retry} failed: {e}")
+
+        if attempt < retry - 1:
+            print(f"Retrying in {delay} seconds...")
+            time.sleep(delay)
+        else:
+            print("All retries failed.")
+            return []
 
     for attempt in range(retry):
         try:
-            response = requests.get(f"{HOST}/stats/contributors", headers=headers)
-            response_json = response.json()
+            response = get_contributors()
 
-            if response_json == {}:
+            if not response:
                 raise ValueError("Empty response received, retrying...")
 
             contributors = [
@@ -43,40 +75,18 @@ def fetch_contributors(retry=5, delay=3):
                     "avatar_url": data["author"]["avatar_url"],
                     "html_url": data["author"]["html_url"]
                 }
-                for data in response_json
+                for data in response
                 if data["author"]["login"] != 'github-actions[bot]'
             ]
 
             for account in merge_accounts:
-                target = account.get("target")
-                sub = account.get("sub", [])
-
-                if target and sub:
-                    merged_total = sum(
-                        contributor["total"] for contributor in contributors
-                        if contributor["login"] in sub
-                    )
-
-                    contributors = [
-                        contributor for contributor in contributors
-                        if contributor["login"] not in sub
-                    ]
-
-                    for contributor in contributors:
-                        if contributor["login"] == target:
-                            contributor["total"] += merged_total
-                            break
+                contributors = merge_contributors(contributors, account)
 
             return sorted(contributors, key=lambda x: x["total"], reverse=True)[:5]
         except (ValueError, requests.exceptions.RequestException) as e:
-            print(f"Attempt {attempt + 1}/{retry} failed: {e}")
+            handle_request_failure(attempt, retry, delay)
 
-            if attempt < retry - 1:
-                print(f"Retrying in {delay} seconds...")
-                time.sleep(delay)
-            else:
-                print("All retries failed.")
-                return []
+    return []
 
 
 def update_readme(contributors):
