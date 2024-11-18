@@ -17,17 +17,26 @@ headers = {
 }
 
 def fetch_contributors(retry=5, delay=3):
+    merge_accounts = [
+        {
+            "target": "0chnxxx",
+            "sub": ["DeepLeHR-Teemo"]
+        },
+        {
+            "target": "pjkfckr",
+            "sub": ["deeplehr-zed"]
+        }
+    ]
+
     for attempt in range(retry):
         try:
             response = requests.get(f"{HOST}/stats/contributors", headers=headers)
             response_json = response.json()
 
-            print(response_json)
-
             if response_json == {}:
                 raise ValueError("Empty response received, retrying...")
 
-            return [
+            contributors = [
                 {
                     "total": data["total"],
                     "login": data["author"]["login"],
@@ -35,7 +44,30 @@ def fetch_contributors(retry=5, delay=3):
                     "html_url": data["author"]["html_url"]
                 }
                 for data in response_json
+                if data["author"]["login"] != 'github-actions[bot]'
             ]
+
+            for account in merge_accounts:
+                target = account.get("target")
+                sub = account.get("sub", [])
+
+                if target and sub:
+                    merged_total = sum(
+                        contributor["total"] for contributor in contributors
+                        if contributor["login"] in sub
+                    )
+
+                    contributors = [
+                        contributor for contributor in contributors
+                        if contributor["login"] not in sub
+                    ]
+
+                    for contributor in contributors:
+                        if contributor["login"] == target:
+                            contributor["total"] += merged_total
+                            break
+
+            return sorted(contributors, key=lambda x: x["total"], reverse=True)[:5]
         except (ValueError, requests.exceptions.RequestException) as e:
             print(f"Attempt {attempt + 1}/{retry} failed: {e}")
 
@@ -92,13 +124,9 @@ def main():
     else:
         print("token is set")
 
-    total_contributors = fetch_contributors()
-    filtered_contributors = [contributor for contributor in total_contributors if contributor["author"]["login"] != 'github-actions[bot]']
-    best_contributors = sorted(filtered_contributors, key=lambda x: x["total"], reverse=True)[:5]
+    contributors = fetch_contributors()
 
-    print(best_contributors)
-
-    update_readme(best_contributors)
+    update_readme(contributors)
 
 
 if __name__ == "__main__":
