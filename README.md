@@ -73,7 +73,12 @@
 <td align='center'>
 <img src='https://avatars.githubusercontent.com/u/101924714?v=4' width='100' height='100'><br>
 <a href='https://github.com/0chnxxx'>0chnxxx</a><br>
-<span>91 commits</span>
+<span>94 commits</span>
+</td>
+<td align='center'>
+<img src='https://avatars.githubusercontent.com/u/160571886?v=4' width='100' height='100'><br>
+<a href='https://github.com/deeplehr-zed'>deeplehr-zed</a><br>
+<span>31 commits</span>
 </td>
 <td align='center'>
 <img src='https://avatars.githubusercontent.com/u/40158148?v=4' width='100' height='100'><br>
