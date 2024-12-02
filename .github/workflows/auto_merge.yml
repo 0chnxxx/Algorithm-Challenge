@@ -1,0 +1,38 @@
+name: Auto Merge
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Get Solved PRs
+        id: get-prs
+        uses: octokit/request-action@v3
+        with:
+          route: GET /repos/{owner}/{repository}/pulls
+          owner: ${{ github.repository_owner }}
+          repository: ${{ github.event.repository.name }}
+          query: >
+            {
+              "labels": "SOLVE",
+              "state": "open"
+            }
+          headers: '{"Accept": "application/vnd.github.v3+json"}'
+
+      - name: Merge PRs
+        if: steps.get-prs.outputs.count > 0
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        run: |
+          echo "Found Solved PRs:"
+          echo ${{ steps.get-prs.outputs.body }}
+          for pr in $(echo "${{ steps.get-prs.outputs.body }}" | jq -r '.[].number'); do
+            echo "Merging PR #$pr"
+            gh pr merge $pr --admin --merge
+          done
