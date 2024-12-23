@@ -15,18 +15,12 @@ jobs:
         uses: octokit/request-action@v2.4.0
         id: get_prs
         with:
-          route: GET /repos/{owner}/{repository}/pulls
-          owner: ${{ github.repository_owner }}
-          repository: ${{ github.event.repository.name }}
-          query: >
-            {
-              "labels": "SOLVE",
-              "state": "open"
-            }
-          headers: '{"Accept": "application/vnd.github.v3+json"}'
+          route: GET /repos/${{ github.repository }}/pulls?state=open&labels=SOLVE
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 
       - name: Merge PRs
-        if: steps.get-prs.outputs.count > 0
+        if: steps.get-prs.outputs.body != '[]'
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
