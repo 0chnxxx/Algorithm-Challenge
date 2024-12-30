@@ -73,12 +73,12 @@
 <td align='center'>
 <img src='https://avatars.githubusercontent.com/u/101924714?v=4' width='100' height='100'><br>
 <a href='https://github.com/0chnxxx'>0chnxxx</a><br>
-<span>136 commits</span>
+<span>143 commits</span>
 </td>
 <td align='center'>
 <img src='https://avatars.githubusercontent.com/u/61726800?v=4' width='100' height='100'><br>
 <a href='https://github.com/pjkfckr'>pjkfckr</a><br>
-<span>61 commits</span>
+<span>64 commits</span>
 </td>
 <td align='center'>
 <img src='https://avatars.githubusercontent.com/u/40158148?v=4' width='100' height='100'><br>
