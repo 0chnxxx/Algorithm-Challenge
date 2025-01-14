@@ -38,12 +38,11 @@ class Solution {
     fun solution(board: Array<IntArray>): Int {
         val n = board.size
         val directions = arrayOf(0 to -1, 0 to 1, -1 to 0, 1 to 0)
-        val cost = Array(n) { IntArray(n) { Int.MAX_VALUE } }
+        val cost = Array(n) { Array(n) { IntArray(4) { Int.MAX_VALUE } } } // x, y 위치에서 4방향에 대한 비용을 저장하기 위한 3차원 배열
         val queue = LinkedList<Triple<Int, Int, Int>>()
 
-        // 시작값 설정
         queue.offer(Triple(0, 0, -1))
-        cost[0][0] = 0
+        directions.forEachIndexed { i, _ -> cost[0][0][i] = 0 }
 
         while (queue.isNotEmpty()) {
             val (x, y, direction) = queue.poll()
@@ -52,24 +51,25 @@ class Solution {
                 val newX = x + delta.first
                 val newY = y + delta.second
 
-                // 새로운 x, y가 범위 안에 있으며 벽이 아닌지
+                // 새로운 x, y가 범위 안에 있으며 벽이 아닌지 확인
                 if (newX in 0 until n && newY in 0 until n && board[newX][newY] == 0) {
                     // 같은 방향이면 직선 도로를 깔기 위해 100원, 다른 방향이면 코너와 직선 도로를 깔기 위해 600원
-                    var newCost = if (direction == -1 || direction == newDirection) 100 else 600
-
-                    // 이전 비용을 합산하여 누적
-                    newCost += cost[x][y]
+                    val newCost = when(direction) {
+                        -1 -> 100 // 출발점에선 직선 도로만 깔기 위해 100원
+                        newDirection -> cost[x][y][direction] + 100 // 같은 방향이면 기존 비용에서 100원 추가
+                        else -> cost[x][y][direction] + 600 // 다른 방향이면 기존 비용에서 600원 추가
+                    }
 
                     // 더 적은 비용이라면
-                    if (newCost < cost[newX][newY]) {
-                        cost[newX][newY] = newCost
+                    if (newCost < cost[newX][newY][newDirection]) {
+                        cost[newX][newY][newDirection] = newCost
                         queue.offer(Triple(newX, newY, newDirection))
                     }
                 }
             }
         }
 
-        // 모든 경우를 다 탐색한 후 최소 비용을 반환
-        return cost[n - 1][n - 1]
+        // 모든 경우를 다 탐색한 후 도착점의 4방향 중 최소 비용을 반환
+        return cost[n - 1][n - 1].minOrNull() ?: Int.MAX_VALUE
     }
 }
