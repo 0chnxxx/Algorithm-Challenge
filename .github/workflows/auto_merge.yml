@@ -15,7 +15,7 @@ jobs:
         uses: octokit/request-action@v2.4.0
         id: get_prs
         with:
-          route: GET /repos/${{ github.repository }}/pulls?state=open&labels=SOLVE
+          route: GET /repos/0chnxxx/${{ github.repository }}/pulls?state=open&labels=SOLVE
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 
