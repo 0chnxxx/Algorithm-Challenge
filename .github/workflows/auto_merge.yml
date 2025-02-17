@@ -14,25 +14,34 @@ jobs:
       - name: Get Solved PRs
         id: get_prs
         run: |
-          URL="https://api.github.com/repos/0chnxxx/Algorithm-Challenge/issues?state=open&labels=SOLVE"
-          HEADERS=(
+          url="https://api.github.com/repos/0chnxxx/Algorithm-Challenge/issues?state=open&labels=SOLVE"
+          headers=(
             "-H" "Accept: application/vnd.github+json"
             "-H" "Authorization: Bearer ${{ secrets.ACCESS_TOKEN }}"
             "-H" "X-GitHub-Api-Version: 2022-11-28"
           )
-          RESPONSE=$(curl -s -L "${HEADERS[@]}" "$URL")
+          response=$(curl "${headers[@]}" "$url")
           echo "Response from API:"
-          echo "$RESPONSE" | jq .
-          echo "body=$(echo "$RESPONSE" | jq -c)" >> "$GITHUB_ENV"
+          echo "$response" | jq .
+          numbers=$(echo "$response" | jq -r '.[].number')
+          echo "PR Numbers from Response:"
+          echo "$numbers"
+          echo "$numbers" >> "$GITHUB_ENV"
 
       - name: Merge PRs
-        if: steps.get-prs.outputs.body != '[]'
+        if: steps.get-prs.outputs.numbers != ''
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
-          echo "Found Solved PRs:"
-          echo ${{ steps.get-prs.outputs.body }}
-          for pr in $(echo "${{ steps.get-prs.outputs.body }}" | jq -r '.[].number'); do
-            echo "Merging PR #$pr"
-            gh pr merge $pr --admin --merge
+          echo "Found Solved PR Numbers: ${{ steps.get_prs.outputs.numbers }}"
+          for number in ${{ steps.get_prs.outputs.numbers }}; do
+            url="https://api.github.com/repos/0chnxxx/Algorithm-Challenge/pulls/$number/merge"
+            headers=(
+              "-H" "Accept: application/vnd.github+json"
+              "-H" "Authorization: Bearer ${{ secrets.ACCESS_TOKEN }}"
+              "-H" "X-GitHub-Api-Version: 2022-11-28"
+            )
+            body='{"commit_title":"Auto Merge PR"}'
+          
+            curl -X PUT "${headers[@]}" -d "$body" "$url"
           done
