@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Get Solved PRs
         id: get_prs
@@ -23,18 +23,17 @@ jobs:
           response=$(curl "${headers[@]}" "$url")
           echo "Response from API:"
           echo "$response" | jq .
-          numbers=$(echo "$response" | jq -r '.[].number')
-          echo "PR Numbers from Response:"
-          echo "$numbers"
-          echo "$numbers" >> "$GITHUB_ENV"
+          numbers=$(echo "$response" | jq -c '[.[].number]')
+          echo "PR Numbers from Response: $numbers"
+          echo "numbers=$numbers" >> $GITHUB_OUTPUT
 
       - name: Merge PRs
         if: steps.get-prs.outputs.numbers != ''
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
-          echo "Found Solved PR Numbers: ${{ steps.get_prs.outputs.numbers }}"
-          for number in ${{ steps.get_prs.outputs.numbers }}; do
+          echo "Found Solved PR Numbers: ${{ fromJSON(steps.get_prs.outputs.numbers) }}"
+          for number in ${{ fromJSON(steps.get_prs.outputs.numbers) }}; do
             url="https://api.github.com/repos/0chnxxx/Algorithm-Challenge/pulls/$number/merge"
             headers=(
               "-H" "Accept: application/vnd.github+json"
