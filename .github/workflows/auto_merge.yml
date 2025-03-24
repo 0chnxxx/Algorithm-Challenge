@@ -8,29 +8,33 @@ jobs:
   auto-merge:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout branch
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch branch
+        run: |
+          git remote update
+          git fetch --all
 
       - name: Get Solved PRs
         id: get_prs
         run: |
-          url="https://api.github.com/repos/0chnxxx/Algorithm-Challenge/issues?state=open&labels=SOLVE"
-          headers=(
-            "-H" "Accept: application/vnd.github+json"
-            "-H" "Authorization: Bearer ${{ secrets.ACCESS_TOKEN }}"
-            "-H" "X-GitHub-Api-Version: 2022-11-28"
-          )
-          response=$(curl "${headers[@]}" "$url")
-          echo "Response from API:"
-          echo "$response" | jq .
-          numbers=$(echo "$response" | jq -c '[.[].number]')
-          echo "PR Numbers from Response: $numbers"
+          numbers=$(gh pr list --state open --label SOLVE --json number --jq '.[].number')
+          echo "PR Numbers : $numbers"
           echo "numbers=$numbers" >> $GITHUB_OUTPUT
+
+#          url="https://api.github.com/repos/0chnxxx/Algorithm-Challenge/issues?state=open&labels=SOLVE"
+#          response=$(curl "$url")
+#          echo "Response from API:"
+#          echo "$response" | jq .
+#          numbers=$(echo "$response" | jq -c '[.[].number]')
+#          echo "PR Numbers from Response: $numbers"
+#          echo "numbers=$numbers" >> $GITHUB_OUTPUT
 
       - name: Merge PRs
         if: steps.get-prs.outputs.numbers != ''
-        env:
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
           echo "Found Solved PR Numbers: ${{ fromJSON(steps.get_prs.outputs.numbers) }}"
           for number in ${{ fromJSON(steps.get_prs.outputs.numbers) }}; do
