@@ -20,6 +20,8 @@ jobs:
 
       - name: Get Solved PRs
         id: get_prs
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           numbers=$(gh pr list --state open --label SOLVE --json number --jq '.[].number')
           echo "PR Numbers : $numbers"
