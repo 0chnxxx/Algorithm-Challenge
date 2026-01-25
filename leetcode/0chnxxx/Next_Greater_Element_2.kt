@@ -1,52 +1,40 @@
 /**
- * The next greater element of some element x in an array is the first greater element that is to the right of x in the same array.
- * You are given two distinct 0-indexed integer arrays nums1 and nums2, where nums1 is a subset of nums2.
- * For each 0 <= i < nums1.length, find the index j such that nums1[i] == nums2[j] and determine the next greater element of nums2[j] in nums2. If there is no next greater element, then the answer for this query is -1.
- * Return an array ans of length nums1.length such that ans[i] is the next greater element as described above.
+ * Given a circular integer array nums (i.e., the next element of nums[nums.length - 1] is nums[0]), return the next greater number for every element in nums.
+ * The next greater number of a number x is the first greater number to its traversing-order next in the array, which means you could search circularly to find its next greater number.
+ * If it doesn't exist, return -1 for this number.
  *
  * Constraints:
- * 1 <= nums1.length <= nums2.length <= 1000
- * 0 <= nums1[i], nums2[i] <= 10^4
- * All integers in nums1 and nums2 are unique.
- * All the integers of nums1 also appear in nums2.
- *
- * Follow up:
- * Could you find an O(nums1.length + nums2.length) solution?
+ * 1 <= nums.length <= 10^4
+ * -10^9 <= nums[i] <= 10^9
  */
 
 fun main() {
-    val nums1 = intArrayOf(4, 1, 2)
-    val nums2 = intArrayOf(1, 3, 4, 2)
+    val nums = intArrayOf(1, 2, 1)
 
-    val result = Solution().nextGreaterElement(nums1, nums2)
+    val result = Solution().nextGreaterElements(nums)
 
-    println(result.joinToString(", "))
+    println(result)
 }
 
 class Solution {
-    // 시간 복잡도 : O(nums1.length + nums2.length)
-    // 공간 복잡도 : O(nums1.length + nums2.length)
-    fun nextGreaterElement(nums1: IntArray, nums2: IntArray): IntArray {
-        val nextGreater = HashMap<Int, Int>()
+    // 시간 복잡도 : O(N)
+    // 공간 복잡도 : O(N)
+    fun nextGreaterElements(nums: IntArray): IntArray {
+        val n = nums.size
+        val result = IntArray(n) { -1 }
         val stack = ArrayDeque<Int>()
 
-        for (num in nums2) {
-            while (stack.isNotEmpty() && num > stack.first()) {
-                val smaller = stack.removeFirst()
-                nextGreater[smaller] = num
+        for (i in 0 until 2 * n) {
+            val cur = nums[i % n]
+
+            while (stack.isNotEmpty() && nums[stack.last()] < cur) {
+                val idx = stack.removeLast()
+                result[idx] = cur
             }
 
-            stack.addFirst(num)
-        }
-
-        while (stack.isNotEmpty()) {
-            nextGreater[stack.removeFirst()] = -1
-        }
-
-        val result = IntArray(nums1.size)
-
-        for (i in nums1.indices) {
-            result[i] = nextGreater[nums1[i]]!!
+            if (i < n) {
+                stack.addLast(i)
+            }
         }
 
         return result
